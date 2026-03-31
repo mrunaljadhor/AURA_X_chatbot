@@ -42,7 +42,7 @@ def get_embedding_model():
 @st.cache_resource
 def get_qa_model():
     """Load the text generation model."""
-    return pipeline("text-generation", model=QA_MODEL, max_length=200)
+    return pipeline("text-generation", model=QA_MODEL, max_new_tokens=150)
 
 @st.cache_resource
 def create_vector_store(documents):
@@ -113,26 +113,46 @@ def generate_answer(query, context_docs):
         return "I do not know the answer to your question as it is not covered in the Indian Space Policy 2023.", []
     
     try:
-        # Create a prompt for text generation
-        prompt = f"""Based on the following context from the Indian Space Policy 2023, answer the question:
-
-Context: {context_text[:500]}
+        # Create a concise prompt for text generation
+        prompt = f"""Context: {context_text[:800]}
 
 Question: {query}
 
-Answer:"""
+Answer based on the context above:"""
         
         # Generate answer
-        result = qa_model(prompt)
-        answer = result[0]['generated_text'].split("Answer:")[-1].strip()
+        result = qa_model(
+            prompt,
+            max_new_tokens=150,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            num_return_sequences=1,
+            pad_token_id=50256  # GPT-2 EOS token to suppress warnings
+        )
+        
+        generated_text = result[0]['generated_text']
+        
+        # Extract the answer part after the prompt
+        if "Answer based on the context above:" in generated_text:
+            answer = generated_text.split("Answer based on the context above:")[-1].strip()
+        else:
+            answer = generated_text[len(prompt):].strip()
+        
+        # Clean up the answer
+        if not answer or len(answer) < 5:
+            # Fallback: return the most relevant context directly
+            answer = f"Based on the Indian Space Policy 2023: {context_text[:400]}..."
         
         # Limit answer length
-        if len(answer) > 500:
-            answer = answer[:500] + "..."
+        if len(answer) > 600:
+            answer = answer[:600] + "..."
         
         return answer, context_docs
     except Exception as e:
-        return "I do not know the answer to your question. Please try a different question.", context_docs
+        # Fallback: return context directly instead of "I don't know"
+        fallback = f"Based on the Indian Space Policy 2023: {context_text[:400]}..."
+        return fallback, context_docs
 
 def main():
     """Main function to run the Streamlit app."""
@@ -175,25 +195,30 @@ def main():
     }
     
     .answer-card {
-        background: linear-gradient(145deg, #f0f4ff 0%, #e8ecf8 100%);
+        background: linear-gradient(145deg, #1e1e2e 0%, #2a2a3d 100%);
         border-left: 4px solid #667eea;
         padding: 1.5rem;
         border-radius: 12px;
         margin: 1rem 0;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        color: #e2e8f0 !important;
+        font-size: 1rem;
+        line-height: 1.6;
     }
     
     .source-card {
-        background: #f8f9fc;
-        border: 1px solid #e2e8f0;
+        background: #1e1e2e;
+        border: 1px solid #3a3a5c;
         padding: 1rem 1.25rem;
         border-radius: 10px;
         margin: 0.75rem 0;
         transition: box-shadow 0.2s ease;
+        color: #e2e8f0 !important;
     }
     
     .source-card:hover {
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
     }
     
     .status-badge {
@@ -289,8 +314,8 @@ def main():
                     content_preview = doc['content'][:300] + "..." if len(doc['content']) > 300 else doc['content']
                     st.markdown(f"""
                     <div class="source-card">
-                        <strong>📌 Source {idx} — Page {doc['page']}</strong><br>
-                        <span style="color: #4a5568; font-size: 0.9rem;">{content_preview}</span>
+                        <strong style="color: #a5b4fc;">📌 Source {idx} — Page {doc['page']}</strong><br>
+                        <span style="color: #cbd5e1; font-size: 0.9rem;">{content_preview}</span>
                     </div>
                     """, unsafe_allow_html=True)
             else:
