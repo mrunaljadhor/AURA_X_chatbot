@@ -1,0 +1,173 @@
+[
+  {
+    "id": "isp-2023-sec4-1",
+    "documentName": "Indian Space Policy 2023",
+    "authority": "IN-SPACe",
+    "section": "Section 4.1",
+    "title": "Mandate of IN-SPACe as Single Window Autonomous Agency",
+    "content": "IN-SPACe shall act as a single-window autonomous agency under the Department of Space to guide, handhold, evaluate, and authorize all space activities of Non-Government Entities (NGEs) in India. Its authorization shall be mandatory and binding on all commercial entities seeking space operations.",
+    "category": "AUTHORIZATION",
+    "keywords": ["IN-SPACe", "single window", "NGE", "authorization", "handhold", "Department of Space"]
+  },
+  {
+    "id": "isp-2023-sec4-2",
+    "documentName": "Indian Space Policy 2023",
+    "authority": "IN-SPACe",
+    "section": "Section 4.2",
+    "title": "Permitted End-to-End Space Operations for Private Entities (NGEs)",
+    "content": "Non-Government Entities (NGEs) are permitted to undertake end-to-end activities in the space sector. This includes the design, manufacturing, launch, tracking, and operational control of satellites, launch vehicles, orbital transfer vehicles, space ground stations, and associated telemetry networks.",
+    "category": "AUTHORIZATION",
+    "keywords": ["NGE", "end-to-end", "satellites", "launch vehicles", "ground stations", "operational control"]
+  },
+  {
+    "id": "isp-2023-sec5-1",
+    "documentName": "Indian Space Policy 2023",
+    "authority": "ISRO",
+    "section": "Section 5.1",
+    "title": "ISRO Transition to Advanced R&D and Space Exploration",
+    "content": "ISRO shall refocus its resources away from routine commercial manufacturing and operational missions, dedicating its primary efforts toward advanced research and development, deep space exploration, planetary missions, human spaceflight programs, and cutting-edge technology maturation.",
+    "category": "RESEARCH_AND_DEVELOPMENT",
+    "keywords": ["ISRO", "research", "deep space", "human spaceflight", "R&D", "routine operations"]
+  },
+  {
+    "id": "isp-2023-sec6-1",
+    "documentName": "Indian Space Policy 2023",
+    "authority": "NSIL",
+    "section": "Section 6.1",
+    "title": "NSIL Commercial Mandate and Tech Transfer",
+    "content": "NewSpace India Limited (NSIL), as the commercial arm under the Department of Space, shall be responsible for commercializing space technologies developed by ISRO, manufacturing launch vehicles through industry consortia, and providing commercial launch and satcom services on business principles.",
+    "category": "COMMERCIAL",
+    "keywords": ["NSIL", "commercial arm", "technology transfer", "consortium", "commercial launch", "satcom"]
+  },
+  {
+    "id": "isp-2023-sec7-3",
+    "documentName": "Indian Space Policy 2023",
+    "authority": "Union Cabinet",
+    "section": "Section 7.3",
+    "title": "Foreign Direct Investment (FDI) Regulatory Framework",
+    "content": "Foreign Direct Investment (FDI) in the Indian space sector is permitted up to 100%. Under the liberalized policy: up to 74% is allowed under Automatic Route for satellite manufacturing and data products; up to 49% under Automatic Route for launch vehicles; beyond these thresholds, government approval route applies.",
+    "category": "FDI_AND_COMMERCE",
+    "keywords": ["FDI", "foreign direct investment", "automatic route", "74%", "49%", "satellite manufacturing", "launch vehicles"]
+  },
+  {
+    "id": "isp-2023-sec8-4",
+    "documentName": "Indian Space Policy 2023",
+    "authority": "IN-SPACe",
+    "section": "Section 8.4",
+    "title": "Space Debris Mitigation & Sustainable Space Operations",
+    "content": "All Indian space objects, whether launched by government or private operators, must strictly comply with internationally accepted Space Debris Mitigation Guidelines (IADC/UN). Operators must demonstrate de-orbit capability or graveyard orbit maneuvers at the end-of-mission lifecycle.",
+    "category": "LIABILITY_AND_INSURANCE",
+    "keywords": ["space debris", "mitigation", "IADC", "graveyard orbit", "de-orbit", "sustainability"]
+  },
+  {
+    "id": "inspace-2024-art3",
+    "documentName": "IN-SPACe NGP Authorization Guidelines 2024",
+    "authority": "IN-SPACe",
+    "section": "Article 3.2",
+    "title": "Mandatory Registration and Licensing of Private Launch Facilities",
+    "content": "Any NGE intending to establish private launch pads or spaceports within Indian territory or maritime exclusive economic zones must obtain site clearance, environmental impact certification, and comprehensive safety clearances from IN-SPACe prior to groundbreaking.",
+    "category": "AUTHORIZATION",
+    "keywords": ["launch pad", "spaceport", "safety clearance", "site clearance", "environmental impact", "NGE"]
+  },
+  {
+    "id": "inspace-2024-art6",
+    "documentName": "IN-SPACe NGP Authorization Guidelines 2024",
+    "authority": "IN-SPACe",
+    "section": "Article 6.1",
+    "title": "Third-Party Liability Caps and Mandatory Indemnity Insurance",
+    "content": "NGE operators must maintain mandatory third-party liability insurance covering the launch phase and on-orbit operations up to the Maximum Probable Loss (MPL) determined by IN-SPACe. The Government of India may provide sovereign indemnity only beyond the prescribed commercial cap.",
+    "category": "LIABILITY_AND_INSURANCE",
+    "keywords": ["liability", "insurance", "third-party", "MPL", "indemnity", "maximum probable loss"]
+  },
+  {
+    "id": "inspace-2024-art9",
+    "documentName": "IN-SPACe NGP Authorization Guidelines 2024",
+    "authority": "IN-SPACe",
+    "section": "Article 9.4",
+    "title": "Access to ISRO Facilities and Infrastructure Pricing Model",
+    "content": "Non-Government Entities may access ISRO testing facilities, launch complexes, tracking stations, and cleanrooms on a fair, non-discriminatory, and cost-recovery basis, scheduled through the centralized IN-SPACe digital facilitation portal.",
+    "category": "INFRASTRUCTURE_ACCESS",
+    "keywords": ["ISRO facilities", "infrastructure access", "cost-recovery", "cleanrooms", "launch complex", "testing"]
+  },
+  {
+    "id": "inspace-2024-art12",
+    "documentName": "IN-SPACe NGP Authorization Guidelines 2024",
+    "authority": "IN-SPACe",
+    "section": "Article 12.1",
+    "title": "Remote Sensing Data Dissemination Resolution Guidelines",
+    "content": "Space-based earth observation data with ground sampling distance (GSD) coarser than 5 meters can be distributed globally without prior screening. Data with GSD of 5 meters or finer requires registered Indian entity verification and automated notification to the IN-SPACe security nodal authority.",
+    "category": "EXPORT_CONTROL",
+    "keywords": ["remote sensing", "GSD", "earth observation", "resolution", "5 meters", "security nodal"]
+  },
+  {
+    "id": "trai-2025-rec2",
+    "documentName": "TRAI Satellite Spectrum Recommendations 2025",
+    "authority": "TRAI",
+    "section": "Recommendation 2.4",
+    "title": "Administrative Allocation Mechanism for Satcom Spectrum",
+    "content": "Pursuant to the Telecommunications Act 2023 (First Schedule), spectrum for satellite-based telecommunications, including user access links and gateway feeder links in Ku and Ka bands, shall be assigned administratively without competitive auctions, subject to prescribed formulaic regulatory charges.",
+    "category": "SPECTRUM_ALLOCATION",
+    "keywords": ["spectrum", "administrative allocation", "telecommunications act", "Ku-band", "Ka-band", "satellite internet", "no auction"]
+  },
+  {
+    "id": "trai-2025-rec5",
+    "documentName": "TRAI Satellite Spectrum Recommendations 2025",
+    "authority": "TRAI",
+    "section": "Recommendation 5.1",
+    "title": "Satellite Earth Station Gateway Authorization Norms",
+    "content": "Satellite Earth Station Gateways (SESGs) established by global or domestic satellite constellation operators must be located within Indian territory to terminate traffic, ensure lawful interception, and maintain compliance with National Security Directive on Telecommunication.",
+    "category": "SPECTRUM_ALLOCATION",
+    "keywords": ["gateway", "SESG", "lawful interception", "national security", "earth station", "constellation"]
+  },
+  {
+    "id": "trai-2025-rec8",
+    "documentName": "TRAI Satellite Spectrum Recommendations 2025",
+    "authority": "TRAI",
+    "section": "Recommendation 8.3",
+    "title": "Interference Coordination & Space-Terrestrial Coexistence",
+    "content": "Non-Geostationary Satellite Orbit (NGSO) systems operating in shared frequency bands with Terrestrial International Mobile Telecommunications (IMT/5G) must observe strict Power Flux Density (PFD) limits at Earth's surface in accordance with ITU Radio Regulations.",
+    "category": "SPECTRUM_ALLOCATION",
+    "keywords": ["PFD", "power flux density", "NGSO", "IMT", "5G coexistence", "interference", "ITU"]
+  },
+  {
+    "id": "isro-ar24-gaganyaan",
+    "documentName": "ISRO Annual Report 2024-25",
+    "authority": "ISRO",
+    "section": "Chapter 3.1",
+    "title": "Gaganyaan Human Spaceflight Mission Qualification Status",
+    "content": "The Gaganyaan human spaceflight qualification program achieved critical milestones with the successful uncrewed orbital demonstration (G1), validation of the Crew Escape System (CES), and environmental control and life support system (ECLSS) human-rating protocols.",
+    "category": "RESEARCH_AND_DEVELOPMENT",
+    "keywords": ["Gaganyaan", "human spaceflight", "crew escape system", "ECLSS", "uncrewed orbital", "astronaut"]
+  },
+  {
+    "id": "isro-ar24-sslv",
+    "documentName": "ISRO Annual Report 2024-25",
+    "authority": "ISRO",
+    "section": "Chapter 4.4",
+    "title": "Commercialization and Technology Transfer of SSLV",
+    "content": "ISRO completed the operational induction of the Small Satellite Launch Vehicle (SSLV) and finalized the full Technology Transfer Package (ToT) to transfer end-to-end manufacturing rights of SSLV to an Indian private industrial consortium.",
+    "category": "COMMERCIAL",
+    "keywords": ["SSLV", "small satellite launch vehicle", "technology transfer", "consortium", "manufacturing rights"]
+  },
+  {
+    "id": "nsil-ar24-commercial",
+    "documentName": "NSIL Annual Report 2023-24",
+    "authority": "NSIL",
+    "section": "Chapter 2.2",
+    "title": "Commercial Mission Procurement and Falcon 9 Contract for GSAT-20",
+    "content": "NSIL executed a high-throughput communication satellite deployment contract with SpaceX to launch GSAT-20 (GSAT-N2) aboard a Falcon 9 rocket to fulfill domestic broadband and in-flight connectivity demands, establishing NSIL's commercial procurement capability.",
+    "category": "COMMERCIAL",
+    "keywords": ["GSAT-20", "Falcon 9", "SpaceX", "broadband", "in-flight connectivity", "NSIL commercial"]
+  },
+  {
+    "id": "nsil-ar24-pslv-production",
+    "documentName": "NSIL Annual Report 2023-24",
+    "authority": "NSIL",
+    "section": "Chapter 3.5",
+    "title": "Industry-Produced PSLV Realization Status",
+    "content": "NSIL's industrial contract with HAL and L&T for the realization of 5 operational PSLV-XL launch vehicles entered integration phase, marking India's maiden transition from agency-built rockets to industry-built heavy launch systems.",
+    "category": "COMMERCIAL",
+    "keywords": ["PSLV", "HAL", "L&T", "industry-built", "commercial launch", "PSLV-XL"]
+  }
+]
+

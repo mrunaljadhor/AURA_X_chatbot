@@ -1,0 +1,54 @@
+{
+  "1. Dense-Only (Semantic Vector)": {
+    "MRR": 0.7857142857142857,
+    "Avg_Latency_ms": 0.025528572483121285,
+    "Precision@1": 0.6428571428571429,
+    "Recall@1": 0.6428571428571429,
+    "HitRate@1": 0.6428571428571429,
+    "Precision@3": 0.2857142857142857,
+    "Recall@3": 0.8571428571428571,
+    "HitRate@3": 0.8571428571428571,
+    "Precision@5": 0.20000000000000004,
+    "Recall@5": 1.0,
+    "HitRate@5": 1.0
+  },
+  "2. Sparse-Only (BM25 Okapi)": {
+    "MRR": 1.0,
+    "Avg_Latency_ms": 0.020014285317821696,
+    "Precision@1": 1.0,
+    "Recall@1": 1.0,
+    "HitRate@1": 1.0,
+    "Precision@3": 0.3333333333333333,
+    "Recall@3": 1.0,
+    "HitRate@3": 1.0,
+    "Precision@5": 0.20000000000000004,
+    "Recall@5": 1.0,
+    "HitRate@5": 1.0
+  },
+  "3. Hybrid Fusion (Dense + BM25 RRF)": {
+    "MRR": 0.9642857142857143,
+    "Avg_Latency_ms": 0.047807143086434474,
+    "Precision@1": 0.9285714285714286,
+    "Recall@1": 0.9285714285714286,
+    "HitRate@1": 0.9285714285714286,
+    "Precision@3": 0.3333333333333333,
+    "Recall@3": 1.0,
+    "HitRate@3": 1.0,
+    "Precision@5": 0.20000000000000004,
+    "Recall@5": 1.0,
+    "HitRate@5": 1.0
+  },
+  "4. NOVA-X (Hybrid RRF + Statutory Reranker)": {
+    "MRR": 0.9523809523809524,
+    "Avg_Latency_ms": 0.09598571549369288,
+    "Precision@1": 0.9285714285714286,
+    "Recall@1": 0.9285714285714286,
+    "HitRate@1": 0.9285714285714286,
+    "Precision@3": 0.3333333333333333,
+    "Recall@3": 1.0,
+    "HitRate@3": 1.0,
+    "Precision@5": 0.20000000000000004,
+    "Recall@5": 1.0,
+    "HitRate@5": 1.0
+  }
+}

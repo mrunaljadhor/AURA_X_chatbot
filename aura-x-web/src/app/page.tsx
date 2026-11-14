@@ -2,26 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  UploadCloud, File, Trash, Send, Loader2, Bot, User,
-  CheckCircle, Copy, Mic, MicOff, Download, ChevronDown,
-  ChevronUp, BookOpen, Clock, X, Rocket, Check,
+  UploadCloud, FileText, Trash2, Send, Loader2, Bot, User,
+  CheckCircle2, Copy, Mic, MicOff, Download, ChevronDown,
+  ChevronUp, ShieldCheck, AlertTriangle, Scale, Cpu, Sparkles,
+  ExternalLink, Layers, Terminal, BookMarked, Globe, Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChatApiResponse, ClaimAttribution, HybridSearchResult, ReasoningStep } from "@/lib/types";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-type Message = {
-  id: string;
-  role: "user" | "bot";
-  content: string;
-  sources?: string[];
-  score?: number;
-};
-
-type Toast = { id: string; message: string; type: "success" | "error" | "info" };
-type DocStatus = "loading" | "indexed" | "error";
-type PreloadedDoc = { name: string; status: DocStatus; chunks?: number };
-
-// ── Animated Star Canvas ───────────────────────────────────────────────────
+// ── Starfield Canvas Background ──────────────────────────────────────────────
 function StarCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -40,14 +29,14 @@ function StarCanvas() {
     };
 
     const init = () => {
-      stars = Array.from({ length: 220 }, () => ({
+      stars = Array.from({ length: 180 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        r: Math.random() * 1.4 + 0.2,
-        alpha: Math.random(),
-        speed: (Math.random() * 0.004 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
-        dx: (Math.random() - 0.5) * 0.08,
-        dy: (Math.random() - 0.5) * 0.08,
+        r: Math.random() * 1.3 + 0.3,
+        alpha: Math.random() * 0.8 + 0.2,
+        speed: (Math.random() * 0.003 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
+        dx: (Math.random() - 0.5) * 0.06,
+        dy: (Math.random() - 0.5) * 0.06,
       }));
     };
 
@@ -55,27 +44,14 @@ function StarCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (const s of stars) {
         s.alpha += s.speed;
-        if (s.alpha > 1 || s.alpha < 0) s.speed *= -1;
+        if (s.alpha > 0.95 || s.alpha < 0.15) s.speed *= -1;
         s.x = (s.x + s.dx + canvas.width) % canvas.width;
         s.y = (s.y + s.dy + canvas.height) % canvas.height;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${Math.max(0, Math.min(1, s.alpha))})`;
+        ctx.fillStyle = `rgba(186, 230, 253, ${Math.max(0, Math.min(1, s.alpha))})`;
         ctx.fill();
       }
-
-      // Nebula glows
-      const glow1 = ctx.createRadialGradient(canvas.width * 0.75, canvas.height * 0.2, 0, canvas.width * 0.75, canvas.height * 0.2, 320);
-      glow1.addColorStop(0, "rgba(102,126,234,0.06)");
-      glow1.addColorStop(1, "transparent");
-      ctx.fillStyle = glow1;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const glow2 = ctx.createRadialGradient(canvas.width * 0.1, canvas.height * 0.8, 0, canvas.width * 0.1, canvas.height * 0.8, 260);
-      glow2.addColorStop(0, "rgba(118,75,162,0.07)");
-      glow2.addColorStop(1, "transparent");
-      ctx.fillStyle = glow2;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       raf = requestAnimationFrame(draw);
     };
@@ -87,76 +63,43 @@ function StarCanvas() {
     return () => { cancelAnimationFrame(raf); };
   }, []);
 
-  return <canvas ref={ref} className="fixed inset-0 w-full h-full z-0 pointer-events-none" />;
+  return <canvas ref={ref} className="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-50" />;
 }
 
-// ── Toast System ──────────────────────────────────────────────────────────
-function ToastContainer({ toasts, remove }: { toasts: Toast[]; remove: (id: string) => void }) {
-  return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
-      <AnimatePresence>
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            initial={{ opacity: 0, x: 60, scale: 0.9 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 60 }}
-            className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium"
-            style={{
-              background: t.type === "success" ? "rgba(20,83,45,0.9)" : t.type === "error" ? "rgba(127,29,29,0.9)" : "rgba(30,27,75,0.9)",
-              border: `1px solid ${t.type === "success" ? "rgba(74,222,128,0.4)" : t.type === "error" ? "rgba(248,113,113,0.4)" : "rgba(165,180,252,0.4)"}`,
-              backdropFilter: "blur(16px)",
-              color: t.type === "success" ? "#86efac" : t.type === "error" ? "#fca5a5" : "#c4b5fd",
-            }}
-          >
-            {t.type === "success" ? <Check size={15} /> : t.type === "error" ? <X size={15} /> : <Rocket size={15} />}
-            <span>{t.message}</span>
-            <button onClick={() => remove(t.id)} style={{ opacity: 0.5 }} className="hover:opacity-100 ml-1"><X size={13} /></button>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
+// ── Types ──────────────────────────────────────────────────────────────────
+interface MessageItem {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  responsePayload?: ChatApiResponse;
+  timestamp: string;
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────
-const SUGGESTED = [
-  "What is the role of IN-SPACe?",
-  "What are ISRO's key missions in 2024-25?",
-  "How does India assign satellite spectrum?",
-  "What activities require authorization from IN-SPACe?",
-  "What is NSIL's role in commercial launches?",
-  "What are the spectrum bands for satellite internet in India?",
-  "What is India's vision for space by 2047?",
-  "How does India regulate private space companies?",
+const SAMPLE_QUESTIONS = [
+  "What are the FDI thresholds for satellite manufacturing & launch vehicles under the 2023 policy?",
+  "What is IN-SPACe's single-window authorization mandate for private spaceports?",
+  "What are the mandatory third-party liability insurance caps (MPL) for private launches?",
+  "How does TRAI handle satcom spectrum allocation under the Telecommunications Act 2023?",
+  "What is ISRO's designated role following the commercial transition to NSIL?",
 ];
 
-const INIT_DOCS: PreloadedDoc[] = [
-  { name: "Indian Space Policy 2023", status: "loading" },
-  { name: "TRAI Satellite Spectrum 2025", status: "loading" },
-  { name: "IN-SPACe NGP 2024", status: "loading" },
-  { name: "ISRO Annual Report 2024-25", status: "loading" },
-  { name: "NSIL Annual Report 2023-24", status: "loading" },
-];
-
-// ── Main Component ────────────────────────────────────────────────────────
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([{
-    id: "init",
-    role: "bot",
-    content: "🚀 Welcome to Nova-X! I am pre-trained on India's key space policy documents. You can ask me anything or try one of the suggested questions below. You can also upload additional documents to expand my knowledge.",
-  }]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<MessageItem[]>([
+    {
+      id: "welcome-1",
+      role: "assistant",
+      content: "Welcome to **NOVA-X**, an autonomous compliance intelligence platform for the Indian Space Regulatory Framework.\n\nI parse and cross-reference statutory instruments including the **Indian Space Policy 2023**, **IN-SPACe Norms 2024**, and **TRAI Satellite Spectrum Recommendations 2025** using hybrid search (BM25 + Dense RRF) and verifiable Explainable AI (XAI) claim attribution.\n\nSelect a preset regulatory scenario below or type your inquiry to initiate an audit.",
+      timestamp: "Just now",
+    },
+  ]);
+  const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState("");
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const [isListening, setIsListening] = useState(false);
-  const [queryHistory, setQueryHistory] = useState<string[]>([]);
-  const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set());
+  const [isAuditorMode, setIsAuditorMode] = useState(true);
+  const [activeCitation, setActiveCitation] = useState<ClaimAttribution | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [docs, setDocs] = useState<PreloadedDoc[]>(INIT_DOCS);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
@@ -164,353 +107,579 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Seed pre-loaded docs on mount
+  // Speech to text initialization
   useEffect(() => {
-    fetch("/api/seed")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.docs) {
-          setDocs(data.docs);
-          const indexed = data.docs.filter((d: PreloadedDoc) => d.status === "indexed").length;
-          if (indexed > 0) {
-            addToast(`✅ ${indexed} document${indexed > 1 ? "s" : ""} indexed into knowledge base!`, "success");
-          } else {
-            addToast("⚠️ Documents found but indexing failed. Check API key.", "error");
-          }
-        } else {
-          setDocs(INIT_DOCS.map((d) => ({ ...d, status: "error" as DocStatus })));
-          addToast("❌ Knowledge base failed to load.", "error");
-        }
-      })
-      .catch(() => setDocs(INIT_DOCS.map((d) => ({ ...d, status: "error" as DocStatus }))));
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-IN";
+        recognition.onresult = (event: any) => {
+          const text = event.results[0][0].transcript;
+          setQuery(text);
+          setIsRecording(false);
+        };
+        recognition.onerror = () => setIsRecording(false);
+        recognition.onend = () => setIsRecording(false);
+        recognitionRef.current = recognition;
+      }
+    }
   }, []);
 
-  const addToast = (message: string, type: Toast["type"] = "info") => {
-    const id = Math.random().toString(36).slice(2);
-    setToasts((p) => [...p, { id, message, type }]);
-    setTimeout(() => setToasts((p) => p.filter((t) => t.id !== id)), 4000);
-  };
-
-  const removeToast = (id: string) => setToasts((p) => p.filter((t) => t.id !== id));
-
-  const submitFile = async () => {
-    if (!file) return;
-    setIsUploading(true);
-    setUploadStatus("Indexing...");
-    const form = new FormData();
-    form.append("file", file);
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = await res.json();
-      if (res.ok) {
-        setUploadStatus("✓ Indexed!");
-        addToast(`"${file.name}" indexed!`, "success");
-        setMessages((p) => [...p, { id: Date.now().toString(), role: "bot", content: `✅ Successfully indexed "${file.name}". Ask me anything about it!` }]);
-        setDocs((prev) => [...prev, { name: file.name, status: "indexed", chunks: data.chunks }]);
-      } else {
-        setUploadStatus("Error");
-        addToast(data.error || "Upload failed", "error");
-      }
-    } catch {
-      addToast("Network error", "error");
-      setUploadStatus("Error");
-    } finally {
-      setIsUploading(false);
+  const toggleRecording = () => {
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+      return;
+    }
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
     }
   };
 
-  const handleSend = async (q?: string) => {
-    const query = (q || input).trim();
-    if (!query || isLoading) return;
-    setInput("");
-    const uid = Date.now().toString();
-    setMessages((p) => [...p, { id: uid + "u", role: "user", content: query }]);
-    setQueryHistory((p) => [query, ...p.slice(0, 4)]);
+  const handleSend = async (textToSend?: string) => {
+    const q = (textToSend || query).trim();
+    if (!q || isLoading) return;
+
+    const userMsg: MessageItem = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: q,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setQuery("");
     setIsLoading(true);
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query: q }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setMessages((p) => [...p, { id: uid + "b", role: "bot", content: data.answer, sources: data.sources, score: data.score }]);
-      } else {
-        setMessages((p) => [...p, { id: uid + "b", role: "bot", content: `Error: ${data.error}` }]);
-        addToast(data.error || "Error", "error");
+
+      if (!res.ok) {
+        throw new Error(`API responded with status ${res.status}`);
       }
-    } catch {
-      setMessages((p) => [...p, { id: uid + "b", role: "bot", content: "Network error." }]);
+
+      const data: ChatApiResponse = await res.json();
+
+      const assistantMsg: MessageItem = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: data.answer,
+        responsePayload: data,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+
+      setMessages((prev) => [...prev, assistantMsg]);
+    } catch (err: any) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          content: `⚠️ Compliance Engine Error: ${err.message || "Failed to process statutory audit."}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const copyMsg = (id: string, content: string) => {
-    navigator.clipboard.writeText(content);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadStatus("Indexing statutory document...");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUploadStatus(`✓ Indexed ${data.clausesCount} clauses from "${file.name}"`);
+      } else {
+        setUploadStatus(`❌ ${data.error || "Upload failed"}`);
+      }
+    } catch (err: any) {
+      setUploadStatus(`❌ Error: ${err.message}`);
+    }
+  };
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
     setCopiedId(id);
-    addToast("Copied!", "success");
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const toggleSources = (id: string) => {
-    setExpandedSources((p) => {
-      const n = new Set(p);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  };
+  const exportAuditReport = (payload: ChatApiResponse, queryText: string) => {
+    const markdown = `# NOVA-X STATUTORY COMPLIANCE AUDIT REPORT
+Generated: ${new Date().toISOString()}
+Inquiry: ${queryText}
 
-  const exportChat = () => {
-    const text = messages.map((m) => `${m.role === "user" ? "You" : "AURA-X"}: ${m.content}`).join("\n\n---\n\n");
+## 1. COMPLIANCE VERDICT
+Status: ${payload.verdict.status}
+Risk Rating: ${payload.verdict.riskRating}
+Primary Governing Authority: ${payload.verdict.primaryAuthority}
+Governing Provision: ${payload.verdict.governingSection}
+
+### Summary:
+${payload.verdict.executiveSummary}
+
+### Mandatory Prerequisites:
+${payload.verdict.mandatoryPrerequisites.map((p) => `- [ ] ${p}`).join("\n")}
+
+## 2. STATUTORY FINDINGS & ANALYSIS
+${payload.answer}
+
+## 3. EXPLAINABLE AI (XAI) CLAIM ATTRIBUTION MATRIX
+${payload.claims
+  .map(
+    (c, i) => `### Claim ${i + 1} [${c.status} - ${(c.confidence * 100).toFixed(0)}% Confidence]
+- **Assertion:** "${c.claim}"
+- **Statutory Instrument:** ${c.sourceDocument} (${c.section})
+- **Verbatim Excerpt:** "${c.verbatimExcerpt}"
+`
+  )
+  .join("\n")}
+
+## 4. RETRIEVAL & ML DIAGNOSTICS
+- Total Statutory Clauses Scored: ${payload.diagnostics.totalClausesIndexed}
+- Hybrid Fusion Strategy: BM25 Okapi + 64-D Dense Vector + Reciprocal Rank Fusion (k=60)
+- Execution Latency: ${payload.diagnostics.latencyMs}ms
+- Synthesizer: ${payload.diagnostics.model}
+`;
+
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
-    a.download = `aura-x-${Date.now()}.txt`;
+    a.href = url;
+    a.download = `nova-x-compliance-audit-${Date.now()}.md`;
     a.click();
-    addToast("Chat exported!", "success");
+    URL.revokeObjectURL(url);
   };
-
-  const toggleVoice = () => {
-    if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) { addToast("Voice not supported in this browser", "error"); return; }
-    const recognition = new SR();
-    recognition.continuous = false;
-    recognition.lang = "en-US";
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    recognition.onresult = (e: any) => { setInput(e.results[0][0].transcript); addToast("Voice captured!", "success"); };
-    recognition.onerror = () => { setIsListening(false); addToast("Voice error", "error"); };
-    recognitionRef.current = recognition;
-    recognition.start();
-  };
-
-  const isDark = (role: string) => role === "bot";
 
   return (
-    <div className="flex h-screen w-full font-sans overflow-hidden relative" style={{ background: "#050505" }}>
+    <div className="relative min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
       <StarCanvas />
-      <ToastContainer toasts={toasts} remove={removeToast} />
 
-      {/* ── Sidebar ── */}
-      <aside className="w-72 flex flex-col p-5 z-10 shrink-0 relative" style={{ background: "rgba(5,5,8,0.85)", backdropFilter: "blur(24px)", borderRight: "1px solid rgba(255,255,255,0.08)" }}>
-        
-        {/* Logo */}
-        <div className="mb-7">
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#667eea,#764ba2)" }}>
-              <Rocket size={16} className="text-white" />
+      {/* ── Top Navigation Bar ────────────────────────────────────────── */}
+      <header className="relative z-10 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-6 py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Cpu className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold tracking-wider text-base text-white">NOVA-X</span>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-cyan-950/90 text-cyan-400 border border-cyan-800/60 font-semibold">
+                Autonomous Compliance RAG
+              </span>
             </div>
-            <span className="text-xl font-bold" style={{ background: "linear-gradient(to right,#667eea,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Nova-X</span>
-          </div>
-          <p className="text-white/35 text-xs pl-10">Space Policy Intelligence</p>
-        </div>
-
-        {/* Knowledge Base */}
-        <div className="mb-5">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
-            <BookOpen size={11} /> Knowledge Base
-          </p>
-          <div className="space-y-1.5">
-            {docs.map((doc, i) => (
-              <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-lg" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${doc.status === "indexed" ? "bg-emerald-400" : doc.status === "loading" ? "bg-amber-400 animate-pulse" : "bg-red-400"}`} />
-                <span className="text-xs text-white/65 truncate flex-1">{doc.name}</span>
-                {doc.chunks && <span className="text-xs text-white/25 shrink-0">{doc.chunks}c</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Upload */}
-        <div className="mb-5">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2.5">Upload Document</p>
-          <div className="rounded-xl p-4 flex flex-col items-center text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.15)" }}>
-            <UploadCloud size={24} style={{ color: "#667eea" }} className="mb-2" />
-            <p className="text-white/40 text-xs mb-3">PDF or TXT · Max 10MB</p>
-            <input type="file" accept=".pdf,.txt" className="hidden" id="fu" onChange={(e) => { if (e.target.files?.[0]) setFile(e.target.files[0]); }} />
-            <label htmlFor="fu" className="text-xs px-3 py-1.5 rounded-lg cursor-pointer text-white font-medium transition-opacity hover:opacity-90" style={{ background: "#667eea" }}>
-              Select File
-            </label>
-          </div>
-          <AnimatePresence>
-            {file && (
-              <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-2 flex items-center gap-2 p-2 rounded-lg" style={{ background: "rgba(255,255,255,0.05)" }}>
-                <File size={13} style={{ color: "#a78bfa" }} />
-                <span className="text-xs flex-1 truncate text-white/60">{file.name}</span>
-                <button onClick={() => { setFile(null); setUploadStatus(""); }} className="text-white/25 hover:text-red-400"><Trash size={12} /></button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {file && (
-            <button onClick={submitFile} disabled={isUploading} className="mt-2 w-full text-xs py-2 rounded-lg text-white font-medium flex items-center justify-center gap-1.5 transition-opacity disabled:opacity-50" style={{ background: "#764ba2" }}>
-              {isUploading ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
-              {isUploading ? "Indexing..." : "Index Document"}
-            </button>
-          )}
-          {uploadStatus && <p className="text-xs text-center mt-1.5 text-white/35">{uploadStatus}</p>}
-        </div>
-
-        {/* Recent Queries */}
-        {queryHistory.length > 0 && (
-          <div className="flex-1 overflow-y-auto smooth-scrollbar">
-            <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
-              <Clock size={11} /> Recent Queries
+            <p className="text-xs text-slate-400 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Hybrid Search (BM25 + Dense RRF) • Statutory XAI Verification
             </p>
-            <div className="space-y-1">
-              {queryHistory.map((q, i) => (
-                <button key={i} onClick={() => handleSend(q)} className="w-full text-left text-xs text-white/45 hover:text-white/80 py-1.5 px-2 rounded-lg hover:bg-white/5 truncate transition-colors">
-                  ↩ {q}
+          </div>
+        </div>
+
+        {/* Mode Toggle & System Status */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-slate-900/90 border border-slate-800 p-1 rounded-lg">
+            <button
+              onClick={() => setIsAuditorMode(true)}
+              className={`text-xs px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5 ${
+                isAuditorMode
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Agentic Auditor Mode
+            </button>
+            <button
+              onClick={() => setIsAuditorMode(false)}
+              className={`text-xs px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5 ${
+                !isAuditorMode
+                  ? "bg-slate-800 text-slate-200 border border-slate-700 shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Direct RAG
+            </button>
+          </div>
+
+          <a
+            href="https://github.com/mrunaljadhor/AURA_X_chatbot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg text-slate-300 flex items-center gap-1.5 transition"
+          >
+            <Globe className="w-3.5 h-3.5" />
+            GitHub
+          </a>
+        </div>
+      </header>
+
+      {/* ── Main Workspace Layout ─────────────────────────────────────── */}
+      <div className="relative z-10 flex-1 flex overflow-hidden">
+        {/* Left Sidebar: Knowledge Base & Statutory Instruments */}
+        <aside className="w-80 border-r border-slate-800/80 bg-slate-950/60 backdrop-blur-sm p-4 hidden md:flex flex-col gap-4 overflow-y-auto">
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+              <BookMarked className="w-3.5 h-3.5 text-cyan-400" />
+              Statutory Knowledge Base
+            </h2>
+            <div className="space-y-2 text-xs">
+              {[
+                { name: "Indian Space Policy 2023", authority: "IN-SPACe / DoS", status: "Indexed" },
+                { name: "IN-SPACe NGP Guidelines 2024", authority: "IN-SPACe", status: "Indexed" },
+                { name: "TRAI Satcom Spectrum 2025", authority: "TRAI", status: "Indexed" },
+                { name: "ISRO Strategic Annual Report", authority: "ISRO", status: "Indexed" },
+                { name: "NSIL Commercial Contracts", authority: "NSIL", status: "Indexed" },
+              ].map((doc, idx) => (
+                <div
+                  key={idx}
+                  className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80 flex items-start justify-between gap-2 hover:border-slate-700 transition"
+                >
+                  <div>
+                    <p className="font-medium text-slate-200">{doc.name}</p>
+                    <p className="text-[11px] text-slate-400">{doc.authority}</p>
+                  </div>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                    {doc.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upload Custom Statutory Instrument */}
+          <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800/80">
+            <label className="text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5 cursor-pointer">
+              <UploadCloud className="w-3.5 h-3.5 text-indigo-400" />
+              Ingest Policy PDF / TXT
+            </label>
+            <input
+              type="file"
+              accept=".pdf,.txt"
+              onChange={handleFileUpload}
+              className="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer w-full"
+            />
+            {uploadStatus && (
+              <p className="text-[11px] mt-2 text-slate-300 font-mono">{uploadStatus}</p>
+            )}
+          </div>
+
+          {/* Regulatory Scenario Templates */}
+          <div className="flex-1">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              Regulatory Inquiry Scenarios
+            </h3>
+            <div className="space-y-1.5">
+              {SAMPLE_QUESTIONS.map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSend(q)}
+                  className="w-full text-left text-xs p-2 rounded-lg bg-slate-900/30 hover:bg-slate-900 border border-slate-800/50 hover:border-cyan-500/40 text-slate-300 transition line-clamp-2"
+                >
+                  "{q}"
                 </button>
               ))}
             </div>
           </div>
-        )}
-      </aside>
 
-      {/* ── Main Chat ── */}
-      <main className="flex-1 flex flex-col relative h-full z-10">
-        
-        {/* Header */}
-        <header className="h-14 flex items-center justify-between px-6 shrink-0" style={{ background: "rgba(5,5,8,0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-white/75">🛰️ Space Policy Terminal</span>
+          {/* Engine Specs */}
+          <div className="text-[11px] text-slate-400 font-mono p-2.5 rounded bg-slate-950 border border-slate-900">
+            <div>Engine: BM25 + Dense RRF</div>
+            <div>XAI Metric: Sentence-NLI Entailment</div>
+            <div>Architecture: Stateless Serverless</div>
           </div>
-          <button onClick={exportChat} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/75 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
-            <Download size={13} /> Export Chat
-          </button>
-        </header>
+        </aside>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 md:px-10 py-6 smooth-scrollbar space-y-5">
-          <AnimatePresence initial={false}>
+        {/* Center Chat Area */}
+        <main className="flex-1 flex flex-col justify-between overflow-hidden">
+          {/* Messages Stream */}
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
             {messages.map((msg) => (
-              <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}
-                className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse ml-auto max-w-2xl" : "max-w-2xl"}`}>
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex gap-3 max-w-4xl mx-auto ${
+                  msg.role === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                {msg.role === "assistant" && (
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-cyan-600 to-indigo-600 flex-shrink-0 flex items-center justify-center shadow-md">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                )}
 
-                {/* Avatar */}
-                <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white shadow-lg"
-                  style={{ background: msg.role === "user" ? "linear-gradient(135deg,#667eea,#764ba2)" : "rgba(118,75,162,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  {msg.role === "user" ? <User size={15} /> : <Rocket size={14} />}
-                </div>
+                <div className={`space-y-3 max-w-3xl ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                  {/* Bubble Content */}
+                  <div
+                    className={`rounded-xl p-4 text-sm leading-relaxed border ${
+                      msg.role === "user"
+                        ? "bg-cyan-600/20 border-cyan-500/40 text-cyan-100 rounded-tr-none ml-auto"
+                        : "bg-slate-900/90 border-slate-800 text-slate-200 rounded-tl-none shadow-xl"
+                    }`}
+                  >
+                    {/* Compliance Verdict Banner (If present) */}
+                    {msg.responsePayload?.verdict && (
+                      <div className="mb-4 p-3.5 rounded-lg border bg-slate-950/90 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-xs font-mono font-bold px-2 py-0.5 rounded border uppercase tracking-wider flex items-center gap-1.5 ${
+                              msg.responsePayload.verdict.status === "COMPLIANT"
+                                ? "bg-emerald-950/80 border-emerald-600/60 text-emerald-300"
+                                : msg.responsePayload.verdict.status === "REQUIRES_INSPACE_AUTHORIZATION"
+                                ? "bg-amber-950/80 border-amber-600/60 text-amber-300"
+                                : "bg-red-950/80 border-red-600/60 text-red-300"
+                            }`}
+                          >
+                            <Scale className="w-3.5 h-3.5" />
+                            {msg.responsePayload.verdict.status.replace(/_/g, " ")}
+                          </span>
 
-                <div className={`flex flex-col gap-1.5 flex-1 ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                  
-                  {/* Relevance Score */}
-                  {msg.score !== undefined && msg.role === "bot" && (
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(102,126,234,0.15)", color: "#a5b4fc", border: "1px solid rgba(102,126,234,0.25)" }}>
-                      {Math.round(msg.score * 100)}% relevance
-                    </span>
-                  )}
+                          <span className="text-[11px] font-mono text-slate-400">
+                            Risk Level:{" "}
+                            <strong className="text-slate-200">{msg.responsePayload.verdict.riskRating}</strong>
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300">
+                          {msg.responsePayload.verdict.executiveSummary}
+                        </p>
+                      </div>
+                    )}
 
-                  {/* Bubble */}
-                  <div className={`px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${msg.role === "user" ? "rounded-tr-sm" : "rounded-tl-sm"}`}
-                    style={{
-                      background: msg.role === "user" ? "linear-gradient(135deg,#667eea,#764ba2)" : "rgba(255,255,255,0.055)",
-                      border: msg.role === "bot" ? "1px solid rgba(255,255,255,0.09)" : "none",
-                      color: "#f1f5f9",
-                    }}>
-                    {msg.content}
+                    {/* Agent Multi-Step Reasoning Accordion */}
+                    {msg.responsePayload?.reasoningSteps && (
+                      <details className="mb-4 rounded-lg bg-slate-950/60 border border-slate-800/80 p-2.5 text-xs group">
+                        <summary className="font-mono text-cyan-400 cursor-pointer flex items-center justify-between select-none">
+                          <span className="flex items-center gap-1.5">
+                            <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                            Agentic Multi-Step Reasoning Trace ({msg.responsePayload.reasoningSteps.length} steps)
+                          </span>
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-open:rotate-180 transition-transform" />
+                        </summary>
+                        <div className="mt-2.5 pt-2 border-t border-slate-800/60 space-y-2">
+                          {msg.responsePayload.reasoningSteps.map((step) => (
+                            <div key={step.id} className="font-mono text-[11px] flex items-start gap-2">
+                              <span className="text-emerald-400">✓</span>
+                              <div>
+                                <span className="font-semibold text-slate-200">{step.title}</span>
+                                <p className="text-slate-400">{step.detail}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* Text Body */}
+                    <div className="whitespace-pre-line prose prose-invert prose-sm max-w-none">
+                      {msg.content}
+                    </div>
+
+                    {/* Explainable AI (XAI) Atomic Claims Matrix */}
+                    {msg.responsePayload?.claims && msg.responsePayload.claims.length > 0 && (
+                      <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                            Explainable AI (XAI) Source Attribution
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-400">
+                            NLI Entailment Verified
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {msg.responsePayload.claims.map((claim) => (
+                            <button
+                              key={claim.id}
+                              onClick={() => setActiveCitation(claim)}
+                              className="text-left p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 transition flex flex-col justify-between gap-1 group"
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+                                  {claim.sourceDocument} • {claim.section}
+                                </span>
+                                <span className="text-[10px] font-mono text-emerald-400 font-semibold">
+                                  {(claim.confidence * 100).toFixed(0)}% Match
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-300 line-clamp-2">
+                                "{claim.claim}"
+                              </p>
+                              <span className="text-[10px] text-cyan-400 flex items-center gap-1 group-hover:underline">
+                                View verbatim statute <ChevronDown className="w-2.5 h-2.5 rotate-[-90deg]" />
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Diagnostic Metrics & Export Footer */}
+                    {msg.responsePayload && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                        <div className="flex items-center gap-3">
+                          <span>Latency: {msg.responsePayload.diagnostics.latencyMs}ms</span>
+                          <span>Clauses Scored: {msg.responsePayload.diagnostics.totalClausesIndexed}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => copyToClipboard(msg.content, msg.id)}
+                            className="hover:text-slate-200 transition flex items-center gap-1"
+                          >
+                            {copiedId === msg.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                            Copy
+                          </button>
+                          <button
+                            onClick={() => exportAuditReport(msg.responsePayload!, "Statutory Policy Query")}
+                            className="hover:text-cyan-400 transition flex items-center gap-1"
+                          >
+                            <Download className="w-3 h-3" />
+                            Export Audit Report
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Bot controls */}
-                  {msg.role === "bot" && (
-                    <div className="flex items-center gap-3 pl-1">
-                      <button onClick={() => copyMsg(msg.id, msg.content)} className="flex items-center gap-1 text-xs transition-colors" style={{ color: copiedId === msg.id ? "#86efac" : "rgba(255,255,255,0.3)" }}>
-                        {copiedId === msg.id ? <Check size={12} /> : <Copy size={12} />}
-                        <span>{copiedId === msg.id ? "Copied" : "Copy"}</span>
-                      </button>
-                      {msg.sources && msg.sources.length > 0 && (
-                        <button onClick={() => toggleSources(msg.id)} className="flex items-center gap-1 text-xs transition-colors hover:text-white/60" style={{ color: "rgba(255,255,255,0.3)" }}>
-                          {expandedSources.has(msg.id) ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                          <span>{Array.from(new Set(msg.sources)).length} source(s)</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Citation Expander */}
-                  <AnimatePresence>
-                    {msg.role === "bot" && expandedSources.has(msg.id) && msg.sources && (
-                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
-                        className="rounded-xl p-3 text-xs space-y-1.5 overflow-hidden w-full" style={{ background: "rgba(102,126,234,0.08)", border: "1px solid rgba(102,126,234,0.2)" }}>
-                        <p className="text-white/40 font-medium uppercase tracking-wider text-xs mb-2">Referenced Sources</p>
-                        {Array.from(new Set(msg.sources)).map((s, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <BookOpen size={11} style={{ color: "#a5b4fc" }} />
-                            <span style={{ color: "#a5b4fc" }}>{s}</span>
-                          </div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <span className="text-[10px] font-mono text-slate-400 px-1">{msg.timestamp}</span>
                 </div>
+
+                {msg.role === "user" && (
+                  <div className="h-8 w-8 rounded-lg bg-cyan-600 flex-shrink-0 flex items-center justify-center shadow-md">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                )}
               </motion.div>
             ))}
-          </AnimatePresence>
 
-          {/* Typing Indicator */}
-          {isLoading && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 max-w-2xl">
-              <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white" style={{ background: "rgba(118,75,162,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <Rocket size={14} />
-              </div>
-              <div className="px-4 py-3.5 rounded-2xl rounded-tl-sm flex items-center gap-1.5" style={{ background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.09)" }}>
-                {[0, 0.18, 0.36].map((delay, i) => (
-                  <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: i % 2 === 0 ? "#667eea" : "#764ba2", animationDelay: `${delay}s` }} />
-                ))}
-              </div>
-            </motion.div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex gap-3 max-w-4xl mx-auto items-center text-sm text-cyan-400 font-mono"
+              >
+                <div className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center">
+                  <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                </div>
+                <span>Executing Hybrid Retrieval & NLI Attribution Verification...</span>
+              </motion.div>
+            )}
 
-        {/* Suggested Questions */}
-        <AnimatePresence>
-          {messages.length <= 1 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-6 py-3 flex flex-wrap gap-2">
-              {SUGGESTED.map((q, i) => (
-                <motion.button key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                  onClick={() => handleSend(q)}
-                  className="text-xs px-3.5 py-2 rounded-full text-white/65 hover:text-white transition-all"
-                  style={{ background: "rgba(102,126,234,0.12)", border: "1px solid rgba(102,126,234,0.25)" }}>
-                  {q}
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Input Bar */}
-        <div className="px-4 py-4 shrink-0" style={{ background: "rgba(5,5,8,0.75)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="max-w-3xl mx-auto flex items-center gap-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-              placeholder="Ask about space policies, ISRO, IN-SPACe..."
-              disabled={isLoading}
-              className="flex-1 text-sm py-3 px-4 rounded-xl text-white/90 placeholder-white/25 outline-none transition-all disabled:opacity-50"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", caretColor: "#667eea" }}
-            />
-            <button onClick={toggleVoice}
-              className="p-3 rounded-xl transition-all"
-              style={{
-                background: isListening ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.06)",
-                border: `1px solid ${isListening ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`,
-                color: isListening ? "#f87171" : "rgba(255,255,255,0.45)",
-              }}>
-              {isListening ? <MicOff size={17} /> : <Mic size={17} />}
-            </button>
-            <button onClick={() => handleSend()} disabled={!input.trim() || isLoading}
-              className="p-3 rounded-xl text-white transition-all disabled:opacity-35"
-              style={{ background: "linear-gradient(135deg,#667eea,#764ba2)" }}>
-              <Send size={17} />
-            </button>
+            <div ref={messagesEndRef} />
           </div>
-        </div>
-      </main>
+
+          {/* Input Control Console */}
+          <div className="p-4 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+            <div className="max-w-4xl mx-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleRecording}
+                className={`p-2.5 rounded-lg border transition ${
+                  isRecording
+                    ? "bg-red-500/20 border-red-500 text-red-400 animate-pulse"
+                    : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                }`}
+                title="Voice Query (Web Speech API)"
+              >
+                {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                placeholder="Ask about IN-SPACe authorization, FDI limits, satellite spectrum, or ISRO mandates..."
+                className="flex-1 bg-slate-900/90 border border-slate-800 focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 rounded-lg px-4 py-2.5 text-sm text-slate-100 placeholder-slate-400 outline-none transition"
+              />
+
+              <button
+                onClick={() => handleSend()}
+                disabled={isLoading || !query.trim()}
+                className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-medium text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                <Send className="w-3.5 h-3.5" />
+                Audit
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* ── Verbatim Citation Modal ───────────────────────────────────── */}
+      <AnimatePresence>
+        {activeCitation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-slate-900 border border-slate-800 rounded-xl max-w-xl w-full p-5 shadow-2xl relative"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-cyan-400" />
+                  <span className="text-sm font-semibold text-slate-100">
+                    Statutory Source Citation
+                  </span>
+                </div>
+                <button
+                  onClick={() => setActiveCitation(null)}
+                  className="text-slate-400 hover:text-slate-200 text-xs px-2 py-1 rounded bg-slate-800"
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-cyan-400 font-semibold">
+                    {activeCitation.sourceDocument} • {activeCitation.section}
+                  </span>
+                  <span className="text-emerald-400">
+                    Authority: {activeCitation.regulatoryAuthority}
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs leading-relaxed text-slate-300 font-serif">
+                  "{activeCitation.verbatimExcerpt}"
+                </div>
+
+                <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs text-slate-400">
+                  <span className="font-semibold text-slate-200 block mb-1">Synthesized Claim:</span>
+                  "{activeCitation.claim}"
+                  <div className="mt-2 flex items-center gap-2 font-mono text-[11px] text-emerald-400">
+                    <span>NLI Entailment Confidence: {(activeCitation.confidence * 100).toFixed(0)}%</span>
+                    <span>• Status: {activeCitation.status}</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

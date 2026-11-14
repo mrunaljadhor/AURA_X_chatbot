@@ -1,0 +1,138 @@
+[
+  {
+    "id": "q1",
+    "category": "DIRECT_STATUTORY",
+    "question": "What is the primary role and legal mandate of IN-SPACe under the Indian Space Policy 2023?",
+    "ground_truth_clause_ids": ["isp-2023-sec4-1"],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["single-window", "autonomous", "guide", "handhold", "authorize"],
+    "expected_verdict": "REQUIRES_INSPACE_AUTHORIZATION"
+  },
+  {
+    "id": "q2",
+    "category": "DIRECT_STATUTORY",
+    "question": "Are Non-Government Entities (NGEs) permitted to manufacture and operate launch vehicles and satellites?",
+    "ground_truth_clause_ids": ["isp-2023-sec4-2"],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["end-to-end", "satellites", "launch vehicles", "ground stations"],
+    "expected_verdict": "COMPLIANT"
+  },
+  {
+    "id": "q3",
+    "category": "DIRECT_STATUTORY",
+    "question": "What are the Foreign Direct Investment (FDI) limits for satellite manufacturing and launch vehicles?",
+    "ground_truth_clause_ids": ["isp-2023-sec7-3"],
+    "ground_truth_authority": "Union Cabinet",
+    "ground_truth_keywords": ["FDI", "74%", "49%", "automatic route", "satellite manufacturing"],
+    "expected_verdict": "COMPLIANT"
+  },
+  {
+    "id": "q4",
+    "category": "DIRECT_STATUTORY",
+    "question": "How did the 2023 policy reposition ISRO's primary mission and resource allocation?",
+    "ground_truth_clause_ids": ["isp-2023-sec5-1"],
+    "ground_truth_authority": "ISRO",
+    "ground_truth_keywords": ["advanced research", "deep space", "human spaceflight", "R&D"],
+    "expected_verdict": "INFORMATIONAL"
+  },
+  {
+    "id": "q5",
+    "category": "DIRECT_STATUTORY",
+    "question": "What commercial responsibilities were assigned to NewSpace India Limited (NSIL)?",
+    "ground_truth_clause_ids": ["isp-2023-sec6-1"],
+    "ground_truth_authority": "NSIL",
+    "ground_truth_keywords": ["commercial arm", "technology transfer", "consortium", "commercial launch"],
+    "expected_verdict": "INFORMATIONAL"
+  },
+  {
+    "id": "q6",
+    "category": "SAFETY_AND_LIABILITY",
+    "question": "What are the third-party liability insurance requirements and Maximum Probable Loss (MPL) rules for private launches?",
+    "ground_truth_clause_ids": ["inspace-2024-art6"],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["third-party liability", "MPL", "indemnity", "maximum probable loss"],
+    "expected_verdict": "REQUIRES_INSPACE_AUTHORIZATION"
+  },
+  {
+    "id": "q7",
+    "category": "SAFETY_AND_LIABILITY",
+    "question": "What space debris mitigation standards must Indian space operators follow at end-of-life?",
+    "ground_truth_clause_ids": ["isp-2023-sec8-4"],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["debris mitigation", "IADC", "graveyard orbit", "de-orbit"],
+    "expected_verdict": "COMPLIANT"
+  },
+  {
+    "id": "q8",
+    "category": "SPECTRUM_AND_TELECOM",
+    "question": "Does TRAI mandate spectrum auction or administrative assignment for satellite broadband?",
+    "ground_truth_clause_ids": ["trai-2025-rec2"],
+    "ground_truth_authority": "TRAI",
+    "ground_truth_keywords": ["administrative allocation", "telecommunications act", "no auction", "Ku-band", "Ka-band"],
+    "expected_verdict": "COMPLIANT"
+  },
+  {
+    "id": "q9",
+    "category": "SPECTRUM_AND_TELECOM",
+    "question": "Where must Satellite Earth Station Gateways (SESGs) be geographically located according to TRAI?",
+    "ground_truth_clause_ids": ["trai-2025-rec5"],
+    "ground_truth_authority": "TRAI",
+    "ground_truth_keywords": ["SESG", "gateway", "Indian territory", "lawful interception"],
+    "expected_verdict": "CONDITIONAL_APPROVAL"
+  },
+  {
+    "id": "q10",
+    "category": "MULTI_HOP_REGULATORY",
+    "question": "Can private space startups access ISRO testing facilities, and how is pricing determined?",
+    "ground_truth_clause_ids": ["inspace-2024-art9"],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["cost-recovery", "cleanrooms", "testing facilities", "fair", "non-discriminatory"],
+    "expected_verdict": "COMPLIANT"
+  },
+  {
+    "id": "q11",
+    "category": "EXPORT_CONTROL",
+    "question": "What is the ground sampling distance (GSD) resolution threshold for earth observation data dissemination without screening?",
+    "ground_truth_clause_ids": ["inspace-2024-art12"],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["5 meters", "GSD", "remote sensing", "dissemination"],
+    "expected_verdict": "COMPLIANT"
+  },
+  {
+    "id": "q12",
+    "category": "MISSION_STATUS",
+    "question": "What is the industrial realization status of the SSLV technology transfer to the private sector?",
+    "ground_truth_clause_ids": ["isro-ar24-sslv"],
+    "ground_truth_authority": "ISRO",
+    "ground_truth_keywords": ["SSLV", "technology transfer", "consortium", "manufacturing rights"],
+    "expected_verdict": "INFORMATIONAL"
+  },
+  {
+    "id": "q13",
+    "category": "MISSION_STATUS",
+    "question": "Which rocket was contracted by NSIL to launch the GSAT-20 high-throughput satellite?",
+    "ground_truth_clause_ids": ["nsil-ar24-commercial"],
+    "ground_truth_authority": "NSIL",
+    "ground_truth_keywords": ["SpaceX", "Falcon 9", "GSAT-20", "broadband"],
+    "expected_verdict": "INFORMATIONAL"
+  },
+  {
+    "id": "q14",
+    "category": "MISSION_STATUS",
+    "question": "Which companies are manufacturing the operational PSLV launch vehicles for NSIL?",
+    "ground_truth_clause_ids": ["nsil-ar24-pslv-production"],
+    "ground_truth_authority": "NSIL",
+    "ground_truth_keywords": ["HAL", "L&T", "PSLV", "industry-produced"],
+    "expected_verdict": "INFORMATIONAL"
+  },
+  {
+    "id": "q15",
+    "category": "ADVERSARIAL_HALLUCINATION_TEST",
+    "question": "Can private companies deploy kinetic anti-satellite weapons in low Earth orbit under Indian Space Policy?",
+    "ground_truth_clause_ids": [],
+    "ground_truth_authority": "IN-SPACe",
+    "ground_truth_keywords": ["peaceful purposes", "prohibited", "strict safety"],
+    "expected_verdict": "RESTRICTED_OR_PROHIBITED"
+  }
+]
+
